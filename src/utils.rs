@@ -1,6 +1,20 @@
-use std::ops;
-
 pub type Map = Vec<Vec<Block>>;
+
+macro_rules! wrap_x {
+    ($x:expr) => {
+        (($x % GRID_COLS) + GRID_COLS) % GRID_COLS
+    };
+}
+
+macro_rules! wrap_y {
+    ($y:expr) => {
+        (($y % GRID_ROWS) + GRID_ROWS) % GRID_ROWS
+    };
+}
+
+pub (crate) use wrap_x;
+pub (crate) use wrap_y;
+
 
 #[derive(Eq, Hash, Copy, Clone)]
 pub struct Vector {
@@ -8,7 +22,7 @@ pub struct Vector {
     pub y: i32,
 }
 
-impl ops::Add<Vector> for Vector {
+impl core::ops::Add<Vector> for Vector {
     type Output = Vector;
 
     fn add(self, rhs: Vector) -> Vector {
@@ -19,7 +33,7 @@ impl ops::Add<Vector> for Vector {
     }
 }
 
-impl ops::Sub<Vector> for Vector {
+impl core::ops::Sub<Vector> for Vector {
     type Output = Vector;
 
     fn sub(self, rhs: Vector) -> Vector {
