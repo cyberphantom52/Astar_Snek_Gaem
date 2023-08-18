@@ -2,8 +2,15 @@ use crate::constants::{GRID_COLS, GRID_ROWS};
 use crate::utils::{Block, Map, Vector};
 use std::collections::HashSet;
 
+// TODO: Switch to using manhattan_distance funtion from utils.rs
 fn calc_herustic(position: Vector, destination: Vector) -> i32 {
-    (position - destination).manhattan_distance()
+    let dx = (position.x - destination.x).abs();
+    let dy = (position.y - destination.y).abs();
+    let dx_wrap = (GRID_COLS as i32 - dx).abs();
+    let dy_wrap = (GRID_ROWS as i32 - dy).abs();
+    let min_dx = dx.min(dx_wrap);
+    let min_dy = dy.min(dy_wrap);
+    min_dx + min_dy
 }
 
 fn get_neighbours(map: &Map, position: Vector) -> Vec<Block> {
