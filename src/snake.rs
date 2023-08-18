@@ -1,5 +1,5 @@
 use crate::constants::{GRID_COLS, GRID_ROWS, SIZE, SPEED};
-use crate::utils::{Direction, Vector};
+use crate::utils::{wrap_x, wrap_y, Direction, Vector};
 use sdl2::{event::Event, keyboard::Keycode, pixels::Color, rect::Rect, render::WindowCanvas};
 
 pub struct Snake {
@@ -60,13 +60,13 @@ impl Snake {
     pub fn get_direction(&self, new_position: Vector) -> Direction {
         let mut direction = self.current_direction;
         if self.body[0].x == new_position.x {
-            direction = if self.body[0].y > new_position.y {
+            direction = if wrap_y!(self.body[0].y - 1) == new_position.y {
                 Direction::UP
             } else {
                 Direction::DOWN
             };
         } else if self.body[0].y == new_position.y {
-            direction = if self.body[0].x > new_position.x {
+            direction = if wrap_x!(self.body[0].x - 1) == new_position.x {
                 Direction::LEFT
             } else {
                 Direction::RIGHT
@@ -95,7 +95,6 @@ impl Snake {
         for i in (1..self.body.len()).rev() {
             self.body[i] = self.body[i - 1];
         }
-
         let sign = match self.current_direction {
             Direction::UP | Direction::LEFT => 1,
             Direction::DOWN | Direction::RIGHT => -1,
@@ -103,10 +102,10 @@ impl Snake {
 
         match self.current_direction {
             Direction::UP | Direction::DOWN => {
-                self.body[0].y = ((self.body[0].y - sign * SPEED) + GRID_ROWS) % GRID_ROWS
+                self.body[0].y = wrap_y!(self.body[0].y - sign * SPEED)
             }
             Direction::RIGHT | Direction::LEFT => {
-                self.body[0].x = ((self.body[0].x - sign * SPEED) + GRID_COLS) % GRID_COLS
+                self.body[0].x = wrap_x!(self.body[0].x - sign * SPEED)
             }
         }
     }
