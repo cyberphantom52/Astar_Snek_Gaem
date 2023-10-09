@@ -1,5 +1,6 @@
 use crate::constants::{GRID_COLS, GRID_ROWS, SIZE, SPEED};
 use crate::utils::{wrap_x, wrap_y, Direction, Vector};
+use sdl2::render::TextureQuery;
 use sdl2::{event::Event, keyboard::Keycode, pixels::Color, rect::Rect, render::WindowCanvas};
 
 pub struct Snake {
@@ -7,6 +8,7 @@ pub struct Snake {
     direction: Direction,
     current_direction: Direction,
     pub path: Vec<Vector>,
+    score: u32,
 }
 
 impl Snake {
@@ -16,6 +18,7 @@ impl Snake {
             direction: Direction::RIGHT,
             current_direction: Direction::RIGHT,
             path: Vec::new(),
+            score: 0,
         }
     }
 
@@ -74,7 +77,7 @@ impl Snake {
         }
         direction
     }
-    
+
     pub fn update(&mut self, astar: bool) {
         if astar {
             if let Some(pos) = self.path.pop() {
@@ -83,7 +86,7 @@ impl Snake {
                 self.direction = self.get_direction(Vector { x: 0, y: 0 });
             }
         }
-        
+
         if self.direction != !self.current_direction {
             self.current_direction = self.direction;
         }
@@ -129,6 +132,28 @@ impl Snake {
         // New body part will be added to the end of the snake at the next update
         // Add at arbitary position for now
         self.body.push(Vector { x: -1, y: -1 });
+        self.score += 1;
+    }
+
+    pub fn draw_score(&mut self, canvas: &mut WindowCanvas) {
+        // Draw the score at the top left corner
+        let score = format!("Score: {}", self.score);
+        let font_context = sdl2::ttf::init().unwrap();
+        let font = font_context
+            .load_font(
+                "/usr/share/fonts/open-sans/OpenSans-Regular.ttf",
+                SIZE as u16,
+            )
+            .unwrap();
+        let surface = font.render(&score).blended(Color::RGB(0, 0, 0)).unwrap();
+        let texture_creator = canvas.texture_creator();
+        let texture = texture_creator
+            .create_texture_from_surface(&surface)
+            .unwrap();
+        let TextureQuery { width, height, .. } = texture.query();
+        let target = Rect::new(0, 0, width, height);
+
+        canvas.copy(&texture, None, Some(target)).unwrap();
     }
 
     pub fn draw(&mut self, canvas: &mut WindowCanvas) {
@@ -141,12 +166,14 @@ impl Snake {
             SIZE,
         );
         canvas.fill_rect(rect).expect("Failed to draw snake head.");
-        
+
         // Draw rest of the body
         canvas.set_draw_color(Color::GREEN);
         for &pos in self.body.iter().skip(1) {
             rect = Rect::new(pos.x * SIZE as i32, pos.y * SIZE as i32, SIZE, SIZE);
             canvas.fill_rect(rect).expect("Failed to draw snake body.");
         }
+
+        self.draw_score(canvas);
     }
 }
