@@ -140,10 +140,7 @@ impl Snake {
         let score = format!("Score: {}", self.score);
         let font_context = sdl2::ttf::init().unwrap();
         let font = font_context
-            .load_font(
-                "/usr/share/fonts/open-sans/OpenSans-Regular.ttf",
-                SIZE as u16,
-            )
+            .load_font("assets/Poppins-Bold.ttf", SIZE as u16)
             .unwrap();
         let surface = font.render(&score).blended(Color::RGB(0, 0, 0)).unwrap();
         let texture_creator = canvas.texture_creator();
