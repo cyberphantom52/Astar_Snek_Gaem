@@ -98,8 +98,14 @@ impl Game {
 
     fn update(&mut self) {
         if self.astar && self.snake.should_find_path() {
-            let path = find_path(&mut self.make_map(), self.snake.body[0], self.food.position);
-            self.snake.set_path(path);
+            if let Some(path) = find_path(&mut self.make_map(), self.snake.body[0], self.food.position) {
+                self.snake.set_path(path);
+            } else {
+                // No path was found; handle this case
+                println!("GAME OVER! score: {}", self.snake.body.len() - 1);
+                println!("No path found.");
+                self.state = GAMESTATE::GAMEOVER;
+            }
         }
 
         self.snake.update(self.astar);

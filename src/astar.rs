@@ -48,20 +48,26 @@ fn has_greater_g_val(open_set: &HashSet<Block>, neigh: &Block) -> bool {
     false
 }
 
-pub fn find_path(map: &mut Map, start: Vector, destination: Vector) -> Vec<Vector> {
+pub fn find_path(map: &mut Map, start: Vector, destination: Vector) -> Option<Vec<Vector>> {
     let mut open_set = HashSet::<Block>::new();
     let mut closed_set = HashSet::<Block>::new();
+    let mut path = Vec::<Vector>::new();
+    let mut current ;
 
     open_set.insert(map[start.y as usize][start.x as usize]);
 
     while !open_set.is_empty() {
-        let current = neighbour_with_min_f(&open_set);
+        current = neighbour_with_min_f(&open_set);
 
         closed_set.insert(current);
         open_set.remove(&current);
 
         if current.pos == destination {
-            break;
+            while current.pos.x != start.x || current.pos.y != start.y{
+                path.push(current.pos);
+                current = map[current.parent_pos.y as usize][current.parent_pos.x as usize];
+            }
+            return Some(path);
         }
 
         let neighbours = get_neighbours(&map, current.pos);
@@ -88,13 +94,5 @@ pub fn find_path(map: &mut Map, start: Vector, destination: Vector) -> Vec<Vecto
             open_set.insert(neigh);
         }
     }
-
-    let mut path = Vec::<Vector>::new();
-    let mut current = map[destination.y as usize][destination.x as usize];
-    while current.pos.x != start.x || current.pos.y != start.y {
-        path.push(current.pos);
-        current = map[current.parent_pos.y as usize][current.parent_pos.x as usize];
-    }
-
-    return path;
+    None
 }
