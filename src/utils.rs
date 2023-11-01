@@ -16,7 +16,7 @@ pub (crate) use wrap_x;
 pub (crate) use wrap_y;
 
 
-#[derive(Eq, Hash, Copy, Clone, Debug)]
+#[derive(Eq, Hash, Copy, Clone)]
 pub struct Vector {
     pub x: i32,
     pub y: i32,
@@ -50,13 +50,11 @@ impl PartialEq for Vector {
     }
 }
 
-/* Dead Code Warning
-
 impl Vector {
     pub fn manhattan_distance(&self) -> i32 {
         self.x.abs() + self.y.abs()
     }
-}*/
+}
 
 #[derive(Eq, PartialEq, Hash, Clone, Copy)]
 pub struct Block {
